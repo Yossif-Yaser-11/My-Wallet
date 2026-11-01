@@ -416,7 +416,7 @@ footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);color:v
         <div class="sum"><span>تكلفة الذهب المسجلة</span><strong id="goldCost">—</strong></div>
         <div class="sum"><span>الفرق عن التكلفة</span><strong id="goldDiff">—</strong></div>
         <div class="sum"><span>إجمالي النقدية</span><strong id="cashTotal">—</strong></div>
-        <div class="actions"><button class="btn btn-ghost" id="csvBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>تنزيل الملخص</button><button class="btn btn-ghost" id="copyBtn" type="button"><svg class="ic"><use href="#i-copy"/></svg>نسخ الملخص</button></div>
+        <div class="actions"><button class="btn btn-ghost" id="csvBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>تنزيل الملخص</button><button class="btn btn-ghost" id="backupBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>تنزيل نسخة احتياطية</button><button class="btn btn-ghost" id="importBtn" type="button">استيراد نسخة احتياطية</button><input id="importFile" type="file" accept=".json,application/json" hidden><button class="btn btn-ghost" id="copyBtn" type="button"><svg class="ic"><use href="#i-copy"/></svg>نسخ الملخص</button></div>
       </section>
     </div>
   </div>
@@ -798,6 +798,95 @@ $('#csvBtn').addEventListener('click',function(){
     if(err&&err.code==='rate_limited'){showToast('استنى لحظة وحاول تاني');return}
     copySummary('تعذر التنزيل، ');
   });
+});
+function backupText(){
+  return JSON.stringify({
+    format:'my-wallet-backup',
+    version:1,
+    exportedAt:new Date().toISOString(),
+    data:{gold:gold,cash:cash,sources:SOURCES,prices:manual}
+  },null,2);
+}
+function browserDownload(filename,data){
+  var url=URL.createObjectURL(new Blob([data],{type:'application/json;charset=utf-8'}));
+  var a=document.createElement('a');a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(function(){URL.revokeObjectURL(url)},1000);
+}
+$('#backupBtn').addEventListener('click',function(){
+  var data=backupText(),filename='my-wallet-backup.json';
+  if(dl){
+    dl.save({filename:filename,data:data}).then(function(){showToast('تم تنزيل النسخة الاحتياطية')}).catch(function(err){
+      if(err&&err.code==='declined')return;
+      if(err&&err.code==='rate_limited'){showToast('استنى لحظة وحاول تاني');return}
+      try{browserDownload(filename,data);showToast('تم تنزيل النسخة الاحتياطية')}catch(e){showToast('تعذر تنزيل النسخة الاحتياطية')}
+    });
+    return;
+  }
+  try{browserDownload(filename,data);showToast('تم تنزيل النسخة الاحتياطية')}catch(e){showToast('تعذر تنزيل النسخة الاحتياطية')}
+});
+function validBackup(data){
+  function isObject(v){return v!==null&&typeof v==='object'&&!Array.isArray(v)}
+  function isAmount(v){return typeof v==='number'&&isFinite(v)&&v>=0}
+  if(!isObject(data)||data.format!=='my-wallet-backup'||data.version!==1||!isObject(data.data))return false;
+  var d=data.data;
+  if(!Array.isArray(d.gold)||!Array.isArray(d.cash)||!Array.isArray(d.sources))return false;
+  var sourceIds=Object.create(null);
+  for(var i=0;i<d.sources.length;i++){
+    var s=d.sources[i];
+    if(!isObject(s)||typeof s.id!=='string'||!/^[a-zA-Z0-9_-]+$/.test(s.id)||typeof s.name!=='string'||!s.name.trim()||sourceIds[s.id])return false;
+    sourceIds[s.id]=true;
+  }
+  for(var j=0;j<d.gold.length;j++){
+    var g=d.gold[j];
+    if(!isObject(g)||typeof g.name!=='string'||!isAmount(g.grams)||[18,21,24].indexOf(g.karat)<0||!isAmount(g.cost)||!isObject(g.from))return false;
+    var fromKeys=Object.keys(g.from);
+    for(var k=0;k<fromKeys.length;k++)if(!/^[a-zA-Z0-9_-]+$/.test(fromKeys[k])||!isAmount(g.from[fromKeys[k]]))return false;
+  }
+  for(var m=0;m<d.cash.length;m++){
+    var c=d.cash[m];
+    if(!isObject(c)||typeof c.name!=='string'||!isAmount(c.amount)||typeof c.src!=='string')return false;
+  }
+  if(d.prices!==null&&(!isObject(d.prices)||!isAmount(d.prices.p24)||!isAmount(d.prices.p21)||!isAmount(d.prices.p18)||typeof d.prices.at!=='number'||!isFinite(d.prices.at)))return false;
+  return true;
+}
+function importBackup(file){
+  var reader=new FileReader();
+  reader.onerror=function(){showToast('تعذرت قراءة الملف')};
+  reader.onload=function(){
+    var backup;
+    try{backup=JSON.parse(reader.result)}catch(e){showToast('الملف ليس نسخة احتياطية صالحة');return}
+    if(!validBackup(backup)){showToast('الملف غير صالح أو غير مدعوم');return}
+    if(!window.confirm('سيتم استبدال بيانات المحفظة الحالية بالبيانات الموجودة في الملف. هل تريد المتابعة؟'))return;
+    var keys=['yw.gold','yw.cash','yw.sources','yw.prices'];
+    var previous=keys.map(function(key){return localStorage.getItem(key)});
+    var values=[JSON.stringify(backup.data.gold),JSON.stringify(backup.data.cash),JSON.stringify(backup.data.sources),backup.data.prices===null?null:JSON.stringify(backup.data.prices)];
+    try{
+      keys.forEach(function(key,index){
+        if(values[index]===null)localStorage.removeItem(key);
+        else localStorage.setItem(key,values[index]);
+      });
+    }catch(e){
+      var rollbackFailed=false;
+      keys.forEach(function(key,index){
+        try{if(previous[index]===null)localStorage.removeItem(key);else localStorage.setItem(key,previous[index])}catch(rollbackError){rollbackFailed=true}
+      });
+      showToast(rollbackFailed?'تعذر الحفظ، وقد لا تكون البيانات السابقة استعيدت بالكامل':'تعذر حفظ البيانات المستوردة على هذا الجهاز');
+      return;
+    }
+    SOURCES.splice.apply(SOURCES,[0,SOURCES.length].concat(backup.data.sources));
+    gold=clone(backup.data.gold);cash=clone(backup.data.cash);manual=backup.data.prices?clone(backup.data.prices):null;
+    prices=manual?{24:manual.p24,21:manual.p21,18:manual.p18}:{24:MARKET.p24,21:MARKET.p21,18:MARKET.p18};
+    renderGold();renderCash();renderPriceInputs();renderFresh();update();
+    showToast('تم استيراد النسخة الاحتياطية');
+  };
+  reader.readAsText(file);
+}
+$('#importBtn').addEventListener('click',function(){$('#importFile').click()});
+$('#importFile').addEventListener('change',function(e){
+  var file=e.target.files&&e.target.files[0];
+  e.target.value='';
+  if(file)importBackup(file);
 });
 $('#copyBtn').addEventListener('click',function(){copySummary('')});
 
