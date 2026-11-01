@@ -1,0 +1,824 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>محفظتي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one summary hero (total + allocation), then a working area with holdings and cash on the right and live prices plus summary on the left. Cards on phones. */
+:root{
+  --bg:#0c0e12; --glow:rgba(240,184,74,.10);
+  --surface:#141821; --inset:#0f1319; --raise:#1a1f2a;
+  --line:#252b37; --line2:#343c4c;
+  --text:#eef1f6; --muted:#a0aabb; --faint:#778297;
+  --accent:#f0b84a; --accent-text:#f0b84a; --accent-ink:#1c1406;
+  --accent-soft:rgba(240,184,74,.13); --accent-line:rgba(240,184,74,.38);
+  --pos:#52d9a4; --pos-soft:rgba(82,217,164,.14);
+  --neg:#ff7f8a; --neg-soft:rgba(255,127,138,.14);
+  --info:#7fb6ff; --warn:#f0b84a;
+  --shadow:0 18px 50px rgba(0,0,0,.32);
+  --f-display:"Readex Pro","IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+  --r-lg:20px; --r-md:14px; --r-sm:10px;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f2f4f8; --glow:rgba(214,150,30,.14);
+    --surface:#ffffff; --inset:#f5f7fa; --raise:#eef1f6;
+    --line:#e0e5ed; --line2:#cdd4df;
+    --text:#121722; --muted:#566175; --faint:#7a8597;
+    --accent:#e8a92e; --accent-text:#9a6200; --accent-ink:#1c1406;
+    --accent-soft:rgba(214,150,30,.14); --accent-line:rgba(154,98,0,.38);
+    --pos:#087a52; --pos-soft:rgba(8,122,82,.10);
+    --neg:#c0313e; --neg-soft:rgba(192,49,62,.10);
+    --info:#1f5fc4; --warn:#9a6200;
+    --shadow:0 14px 40px rgba(30,40,60,.10);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f2f4f8; --glow:rgba(214,150,30,.14);
+  --surface:#ffffff; --inset:#f5f7fa; --raise:#eef1f6;
+  --line:#e0e5ed; --line2:#cdd4df;
+  --text:#121722; --muted:#566175; --faint:#7a8597;
+  --accent:#e8a92e; --accent-text:#9a6200; --accent-ink:#1c1406;
+  --accent-soft:rgba(214,150,30,.14); --accent-line:rgba(154,98,0,.38);
+  --pos:#087a52; --pos-soft:rgba(8,122,82,.10);
+  --neg:#c0313e; --neg-soft:rgba(192,49,62,.10);
+  --info:#1f5fc4; --warn:#9a6200;
+  --shadow:0 14px 40px rgba(30,40,60,.10);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#0c0e12; --glow:rgba(240,184,74,.10);
+  --surface:#141821; --inset:#0f1319; --raise:#1a1f2a;
+  --line:#252b37; --line2:#343c4c;
+  --text:#eef1f6; --muted:#a0aabb; --faint:#778297;
+  --accent:#f0b84a; --accent-text:#f0b84a; --accent-ink:#1c1406;
+  --accent-soft:rgba(240,184,74,.13); --accent-line:rgba(240,184,74,.38);
+  --pos:#52d9a4; --pos-soft:rgba(82,217,164,.14);
+  --neg:#ff7f8a; --neg-soft:rgba(255,127,138,.14);
+  --info:#7fb6ff; --warn:#f0b84a;
+  --shadow:0 18px 50px rgba(0,0,0,.32);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:radial-gradient(60rem 28rem at 88% -8%,var(--glow),transparent 62%) no-repeat,var(--bg);
+  color:var(--text);
+  font-family:var(--f-body);font-size:16px;line-height:1.7;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{
+  width:100%;max-width:1280px;margin-inline:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 56px;
+}
+h1,h2,h3,p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ic{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.num,.tabular{font-variant-numeric:tabular-nums}
+
+/* entrance */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes grow{from{transform:scaleX(0)}}
+@keyframes sheen{from{transform:translateX(130%)}to{transform:translateX(-130%)}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.rise{animation:rise .65s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,0s)}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px 20px;flex-wrap:wrap;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--accent);color:var(--accent-ink);flex:none}
+.brand-mark .ic{width:26px;height:26px;stroke-width:1.9}
+h1{font-family:var(--f-display);font-weight:600;font-size:clamp(1.5rem,3.6vw,2rem);line-height:1.25;letter-spacing:-.01em;text-wrap:balance}
+.tag{color:var(--muted);font-size:.9rem;margin-top:2px}
+.tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.icon-btn{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);cursor:pointer;color:var(--muted);transition:color .2s,border-color .2s,transform .2s}
+.icon-btn:hover{color:var(--text);border-color:var(--accent-line);transform:translateY(-1px)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:0;background:linear-gradient(135deg,var(--surface),var(--raise));border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow)}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 35%,var(--accent-soft) 50%,transparent 65%);animation:sheen 2.2s .5s ease-in-out 1 both}
+.hero-main{padding:30px 32px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.eyebrow{font-size:.82rem;letter-spacing:.06em;color:var(--muted);font-weight:500}
+.hero-value{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;font-family:var(--f-display);font-weight:600;font-size:clamp(2.5rem,6.4vw,3.9rem);line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hero-value small{font-size:.38em;font-weight:500;color:var(--muted);letter-spacing:0}
+.delta{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;padding:5px 12px;border-radius:999px;font-size:.88rem;font-weight:500;font-variant-numeric:tabular-nums}
+.delta.pos{background:var(--pos-soft);color:var(--pos)}
+.delta.neg{background:var(--neg-soft);color:var(--neg)}
+.alloc{margin-top:8px;display:flex;flex-direction:column;gap:10px}
+.alloc-bar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--inset);gap:3px}
+.alloc-bar span{display:block;height:100%;min-width:0;transition:flex-basis .7s cubic-bezier(.2,.7,.2,1);transform-origin:right;animation:grow .9s .35s cubic-bezier(.2,.7,.2,1) both}
+.seg-gold{background:var(--accent);border-radius:99px}
+.seg-cash{background:var(--info);border-radius:99px}
+.alloc-legend{display:flex;gap:20px;flex-wrap:wrap;font-size:.88rem;color:var(--muted)}
+.alloc-legend span{display:inline-flex;align-items:center;gap:8px}
+.alloc-legend i{width:10px;height:10px;border-radius:50%}
+.alloc-legend b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.hero-stats{display:flex;flex-direction:column;justify-content:center;border-inline-start:1px solid var(--line);padding:14px 32px}
+.stat{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid var(--line)}
+.stat:last-child{border-bottom:0}
+.stat-label{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.92rem}
+.stat-label .ic{color:var(--accent-text)}
+.stat-value{font-family:var(--f-display);font-weight:600;font-size:1.3rem;font-variant-numeric:tabular-nums;text-align:end;overflow-wrap:anywhere}
+.stat-value small{font-size:.65em;font-weight:500;color:var(--muted);margin-inline-start:5px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start;margin-top:24px}
+.col{display:flex;flex-direction:column;gap:24px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;min-width:0;transition:border-color .25s}
+.panel:hover{border-color:var(--line2)}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}
+h2{display:flex;align-items:center;gap:12px;font-family:var(--f-display);font-weight:600;font-size:1.15rem;line-height:1.4}
+h2 .ic-box{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:var(--accent-soft);color:var(--accent-text);flex:none}
+.hint{color:var(--muted);font-size:.9rem;margin-top:6px;max-width:60ch}
+.head-meta{font-family:var(--f-display);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--info);padding-top:6px}
+
+/* rows (holdings + cash) */
+.rows-head,.row{display:grid;gap:12px;align-items:center}
+.gold-grid{grid-template-columns:minmax(0,1fr) 84px 78px 120px 112px 44px}
+.cash-grid{grid-template-columns:minmax(0,1fr) 128px 140px 44px}
+.rows-head{padding:0 4px 10px;border-bottom:1px solid var(--line);font-size:.8rem;color:var(--faint);font-weight:500;letter-spacing:.04em}
+.row{padding:12px 4px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row.enter{animation:pop .35s ease both}
+.c{min-width:0}
+.cl{display:none;font-size:.78rem;color:var(--faint);margin-bottom:6px;font-weight:500}
+.in{width:100%;min-height:44px;padding:9px 12px;background:var(--inset);border:1px solid var(--line);border-radius:var(--r-sm);outline:none;transition:border-color .2s,box-shadow .2s}
+.in:hover{border-color:var(--line2)}
+.in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.in.num{text-align:center;font-variant-numeric:tabular-nums}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.val{display:flex;flex-direction:column;line-height:1.35}
+.val strong{font-family:var(--f-display);font-weight:600;font-size:1rem;color:var(--accent-text);font-variant-numeric:tabular-nums}
+.pl{font-size:.78rem;font-variant-numeric:tabular-nums;min-height:1.05em}
+.pl.pos{color:var(--pos)}.pl.neg{color:var(--neg)}
+.btn-del{display:grid;place-items:center;width:44px;height:44px;border-radius:var(--r-sm);border:1px solid transparent;background:transparent;color:var(--faint);cursor:pointer;transition:color .2s,background .2s,border-color .2s}
+.btn-del:hover{color:var(--neg);background:var(--neg-soft);border-color:transparent}
+.empty{padding:22px 0 6px;color:var(--muted);font-size:.92rem}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:46px;padding:10px 18px;border-radius:12px;border:1px solid transparent;font-weight:600;font-size:.92rem;cursor:pointer;transition:transform .2s,filter .2s,border-color .2s,background .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:none}
+.btn-primary{background:var(--accent);color:var(--accent-ink)}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;border-color:var(--line2);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent-line);background:var(--accent-soft)}
+.btn-danger{background:var(--neg-soft);color:var(--neg);border-color:transparent}
+.confirm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.92rem;color:var(--muted)}
+
+/* prices */
+.price-list{display:flex;flex-direction:column;gap:10px}
+.price-row{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;background:var(--inset);border:1px solid var(--line);border-radius:var(--r-md)}
+.karat{display:flex;align-items:baseline;gap:6px;font-family:var(--f-display);font-weight:600;color:var(--accent-text)}
+.karat b{font-size:1.6rem;line-height:1}
+.karat span{font-size:.8rem;color:var(--muted);font-weight:500}
+.price-row .in{background:var(--surface);font-family:var(--f-display);font-weight:600;font-size:1.05rem}
+.unit{font-size:.78rem;color:var(--faint);white-space:nowrap}
+.price-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:99px;font-size:.8rem;font-weight:500;background:var(--pos-soft);color:var(--pos)}
+.chip.manual{background:rgba(127,182,255,.15);color:var(--info)}
+.link-btn{background:none;border:0;padding:6px 2px;color:var(--accent-text);font-size:.86rem;font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:4px}
+.note{margin-top:16px;padding:13px 15px;border-radius:var(--r-md);background:var(--inset);border:1px solid var(--line);color:var(--muted);font-size:.84rem;line-height:1.85}
+.note a{color:var(--accent-text)}
+
+/* source dashboard */
+.src-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.src-card{display:flex;flex-direction:column;gap:10px;padding:16px;background:var(--inset);border:1px solid var(--line);border-radius:var(--r-md);min-width:0}
+.src-card.unset{border-style:dashed}
+.src-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.src-name{font-family:var(--f-display);font-weight:600;font-size:.98rem}
+.src-pct{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.src-total{font-family:var(--f-display);font-weight:600;font-size:1.5rem;line-height:1.2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.src-total small{font-size:.55em;font-weight:500;color:var(--muted);margin-inline-start:5px}
+.src-bar{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--line);gap:2px}
+.src-bar span{display:block;height:100%;min-width:0}
+.src-bar .sg{background:var(--accent)}
+.src-bar .sc{background:var(--info)}
+.src-legend{display:flex;flex-direction:column;gap:4px;font-size:.84rem;color:var(--muted)}
+.src-legend div{display:flex;justify-content:space-between;gap:10px}
+.src-legend b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.src-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-inline-end:7px}
+.src-legend .d-g{background:var(--accent)}
+.src-legend .d-c{background:var(--info)}
+.src-note{margin-top:14px;padding:11px 14px;border-radius:var(--r-md);background:var(--accent-soft);color:var(--text);font-size:.88rem;line-height:1.8}
+.src-x{display:grid;place-items:center;width:36px;height:36px;margin-inline-start:auto;border-radius:var(--r-sm);border:0;background:transparent;color:var(--faint);cursor:pointer;transition:color .2s,background .2s}
+.src-x:hover{color:var(--neg);background:var(--neg-soft)}
+.src-add{display:flex;gap:10px;flex-wrap:wrap;align-items:center;flex:1 1 320px}
+.src-add .in{flex:1 1 180px;width:auto}
+.src-det{grid-column:1/-1}
+.src-det summary{cursor:pointer;display:flex;align-items:center;gap:8px;min-height:40px;padding:4px 2px;list-style:none;font-size:.84rem;color:var(--muted)}
+.src-det summary::-webkit-details-marker{display:none}
+.src-det summary::before{content:"◂";color:var(--accent-text);transition:transform .2s}
+.src-det[open] summary::before{transform:rotate(-90deg)}
+.src-det.warn summary{color:var(--neg)}
+.src-in{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;padding:8px 2px 4px}
+.src-in label{display:flex;flex-direction:column;gap:6px;font-size:.78rem;color:var(--faint);font-weight:500}
+
+/* summary */
+.sum{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);font-size:.94rem}
+.sum:last-of-type{border-bottom:0}
+.sum span:first-child{color:var(--muted)}
+.sum strong{font-weight:600;font-variant-numeric:tabular-nums;text-align:end;overflow-wrap:anywhere}
+.sum strong.pos{color:var(--pos)}.sum strong.neg{color:var(--neg)}
+
+footer{margin-top:36px;padding-top:20px;border-top:1px solid var(--line);color:var(--faint);font-size:.82rem;text-align:center}
+
+/* toast */
+.toast{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;pointer-events:none;
+  padding:0 max(16px,env(safe-area-inset-left,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));z-index:20}
+.toast-box{pointer-events:auto;display:flex;align-items:center;gap:16px;max-width:100%;padding:12px 16px;border-radius:14px;background:var(--text);color:var(--bg);box-shadow:var(--shadow);font-size:.9rem;animation:pop .3s ease both}
+.toast-box button{background:none;border:0;padding:4px 2px;font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+
+/* narrow desktop / tablet: single column, prices first */
+@media (max-width:1180px){
+  .layout{display:flex;flex-direction:column;gap:20px}
+  .col{display:contents}
+  #pricesPanel{order:1}#goldPanel{order:2}#cashPanel{order:3}#summaryPanel{order:4}
+}
+@media (max-width:820px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-main{padding:24px 20px 20px}
+  .hero-stats{border-inline-start:0;border-top:1px solid var(--line);padding:6px 20px}
+  .panel{padding:20px 16px;border-radius:18px}
+  .gold-head{display:none}
+  .gold-grid.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:16px;margin-bottom:12px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--inset);position:relative}
+  .gold-grid.row:last-child{border-bottom:1px solid var(--line)}
+  .gold-grid .c-name{grid-column:1/-1;padding-inline-end:48px}
+  .gold-grid .c-x{position:absolute;top:10px;inset-inline-end:10px}
+  .gold-grid .cl{display:block}
+  .gold-grid .in{background:var(--surface)}
+  .gold-grid .val{min-height:44px;justify-content:center}
+  .cash-head{display:none}
+  .cash-grid.row{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 44px;gap:10px;align-items:end}
+  .cash-grid .c-cname{grid-column:1/-1}
+  .cash-grid .cl{display:block}
+}
+@media (max-width:480px){
+  .top{margin-bottom:18px}
+  .brand-mark{width:46px;height:46px;border-radius:14px}
+  .stat-value{font-size:1.15rem}
+  .price-row{grid-template-columns:78px minmax(0,1fr);}
+  .price-row .unit{display:none}
+  .actions .btn{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-bar" viewBox="0 0 24 24"><path d="M6.5 7h11l3.5 10H3z"/><path d="M8.5 17l1.6-4.5M15.5 17l-1.6-4.5M10.1 12.5h3.8"/></symbol>
+    <symbol id="i-coins" viewBox="0 0 24 24"><circle cx="9" cy="9" r="6"/><path d="M15.2 5.2A6 6 0 1 1 9 21"/><path d="M7 9h4"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14"/><path d="M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v.01M18 14.5v.01"/></symbol>
+    <symbol id="i-piggy" viewBox="0 0 24 24"><path d="M5 11a7 6 0 0 1 12.5-3.6l2.5.1-.6 3.2A5 5 0 0 1 19 14v3h-3v-1.5H9V17H6v-3a6 5 0 0 1-1-3z"/><path d="M15.5 11.5v.01"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
+    <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 7.5h7M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l.9 12.5h9.2L17.5 7M10.2 11v5.5M13.8 11v5.5"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1L3.5 8.5"/><path d="M3.5 3.5v5h5"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3.5v12M7 11l5 5 5-5M4.5 20.5h15"/></symbol>
+    <symbol id="i-split" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9h-9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4L6 18M18 6l1.4-1.4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a6.8 6.8 0 0 0 10 10z"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top rise">
+    <div class="brand">
+      <div class="brand-mark"><svg class="ic"><use href="#i-bar"/></svg></div>
+      <div>
+        <h1>محفظتي</h1>
+        
+      </div>
+    </div>
+    <div class="tools">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="تبديل الوضع الليلي والنهاري"><svg class="ic" id="themeIc"><use href="#i-sun"/></svg></button>
+    </div>
+  </header>
+
+  <section class="hero rise" style="--d:.08s" aria-label="ملخص المحفظة">
+    <div class="hero-main">
+      <p class="eyebrow">إجمالي المحفظة</p>
+      <div class="hero-value"><span id="grandTotal">—</span><small>ج.م</small></div>
+      <div class="delta pos" id="heroDelta" hidden></div>
+      <div class="alloc">
+        <div class="alloc-bar" aria-hidden="true"><span class="seg-gold" id="barGold"></span><span class="seg-cash" id="barCash"></span></div>
+        <div class="alloc-legend">
+          <span><i class="seg-gold"></i>ذهب <b id="pctGold">—</b></span>
+          <span><i class="seg-cash"></i>نقدية <b id="pctCash">—</b></span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-label"><svg class="ic"><use href="#i-scale"/></svg>وزن الذهب</div><div class="stat-value"><span id="totalGrams">—</span><small>جم</small></div></div>
+      <div class="stat"><div class="stat-label"><svg class="ic"><use href="#i-coins"/></svg>قيمة الذهب</div><div class="stat-value"><span id="goldValue">—</span><small>ج.م</small></div></div>
+      <div class="stat"><div class="stat-label"><svg class="ic"><use href="#i-cash"/></svg>السيولة النقدية</div><div class="stat-value"><span id="cashValue">—</span><small>ج.م</small></div></div>
+    </div>
+  </section>
+
+  <section class="panel rise" id="sourcePanel" style="--d:.12s;margin-top:24px" aria-label="الفلوس حسب المصدر">
+    <div class="panel-head">
+      <div>
+        <h2><span class="ic-box"><svg class="ic"><use href="#i-split"/></svg></span>الفلوس حسب المصدر</h2>
+        <p class="hint">كل مصدر كام منه في الذهب (بسعره الحالي) وكام نقدية.</p>
+      </div>
+    </div>
+    <div class="src-grid" id="srcGrid"></div>
+    <p class="src-note" id="srcNote" hidden></p>
+    <div class="actions">
+      <button class="btn btn-primary" id="addSrc" type="button"><svg class="ic"><use href="#i-plus"/></svg>إضافة مصدر</button>
+      <form class="src-add" id="srcForm" hidden>
+        <input class="in" id="srcName" type="text" maxlength="30" placeholder="اسم المصدر، مثلًا: هدية" aria-label="اسم المصدر الجديد">
+        <button class="btn btn-primary" type="submit">إضافة</button>
+        <button class="btn btn-ghost" id="srcCancel" type="button">إلغاء</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="layout">
+    <div class="col">
+      <section class="panel rise" id="goldPanel" style="--d:.16s">
+        <div class="panel-head">
+          <div>
+            <h2><span class="ic-box"><svg class="ic"><use href="#i-coins"/></svg></span>مدخرات الذهب</h2>
+            <p class="hint">تحت كل قطعة اكتب كام جنيه حطيت فيها من كل مصدر.</p>
+          </div>
+        </div>
+        <div class="rows-head gold-head gold-grid"><span>القطعة</span><span>الوزن (جم)</span><span>العيار</span><span>القيمة الحالية</span><span>تكلفة الشراء</span><span></span></div>
+        <div id="goldRows"></div>
+        <div class="actions" id="goldActions">
+          <button class="btn btn-primary" id="addGold" type="button"><svg class="ic"><use href="#i-plus"/></svg>إضافة ذهب</button>
+          <button class="btn btn-ghost" id="resetGold" type="button"><svg class="ic"><use href="#i-reset"/></svg>استعادة بيانات البداية</button>
+          <div class="confirm" id="resetAsk" hidden>
+            <span>سيتم استبدال قائمة الذهب الحالية بالبيانات الأصلية.</span>
+            <button class="btn btn-danger" id="resetYes" type="button">نعم، استعد</button>
+            <button class="btn btn-ghost" id="resetNo" type="button">إلغاء</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel rise" id="cashPanel" style="--d:.24s">
+        <div class="panel-head">
+          <div>
+            <h2><span class="ic-box"><svg class="ic"><use href="#i-piggy"/></svg></span>السيولة ومصادر التحويش</h2>
+            
+          </div>
+          <div class="head-meta"><span id="cashHead">—</span> ج.م</div>
+        </div>
+        <div class="rows-head cash-grid cash-head"><span>الاسم</span><span>المصدر</span><span>المبلغ (جنيه)</span><span></span></div>
+        <div id="cashRows"></div>
+        <div class="actions"><button class="btn btn-primary" id="addCash" type="button"><svg class="ic"><use href="#i-plus"/></svg>إضافة مبلغ</button></div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="panel rise" id="pricesPanel" style="--d:.2s">
+        <div class="panel-head">
+          <div>
+            <h2><span class="ic-box"><svg class="ic"><use href="#i-chart"/></svg></span>أسعار الذهب في مصر</h2>
+            
+          </div>
+        </div>
+        <div class="price-list">
+          <div class="price-row"><div class="karat"><b>٢٤</b><span>عيار</span></div><input class="in num" id="p24" type="number" inputmode="decimal" min="0" step="1" aria-label="سعر جرام عيار 24"><span class="unit">ج.م / جم</span></div>
+          <div class="price-row"><div class="karat"><b>٢١</b><span>عيار</span></div><input class="in num" id="p21" type="number" inputmode="decimal" min="0" step="1" aria-label="سعر جرام عيار 21"><span class="unit">ج.م / جم</span></div>
+          <div class="price-row"><div class="karat"><b>١٨</b><span>عيار</span></div><input class="in num" id="p18" type="number" inputmode="decimal" min="0" step="1" aria-label="سعر جرام عيار 18"><span class="unit">ج.م / جم</span></div>
+        </div>
+        <div class="price-meta">
+          <span class="chip" id="priceChip">سعر السوق</span>
+          <button class="link-btn" id="useMarket" type="button" hidden>العودة لسعر السوق</button>
+        </div>
+        <div class="note" id="priceNote"></div>
+      </section>
+
+      <section class="panel rise" id="summaryPanel" style="--d:.28s">
+        <div class="panel-head">
+          <h2><span class="ic-box"><svg class="ic"><use href="#i-calc"/></svg></span>ملخص المحفظة</h2>
+        </div>
+        <div class="sum"><span>عدد قطع الذهب</span><strong id="itemCount">—</strong></div>
+        <div class="sum"><span>وزن عيار ٢٤</span><strong id="g24">—</strong></div>
+        <div class="sum"><span>وزن عيار ٢١</span><strong id="g21">—</strong></div>
+        <div class="sum"><span>وزن عيار ١٨</span><strong id="g18">—</strong></div>
+        <div class="sum"><span>تكلفة الذهب المسجلة</span><strong id="goldCost">—</strong></div>
+        <div class="sum"><span>الفرق عن التكلفة</span><strong id="goldDiff">—</strong></div>
+        <div class="sum"><span>إجمالي النقدية</span><strong id="cashTotal">—</strong></div>
+        <div class="actions"><button class="btn btn-ghost" id="csvBtn" type="button"><svg class="ic"><use href="#i-down"/></svg>تنزيل الملخص</button><button class="btn btn-ghost" id="copyBtn" type="button"><svg class="ic"><use href="#i-copy"/></svg>نسخ الملخص</button></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s)};
+var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- formatting ---- */
+var nf0=new Intl.NumberFormat('ar-EG',{maximumFractionDigits:0});
+var nf1=new Intl.NumberFormat('ar-EG',{maximumFractionDigits:1});
+var nf3=new Intl.NumberFormat('ar-EG',{maximumFractionDigits:3});
+function EGP(n){return nf0.format(Math.round(n||0))}
+function GM(n){return nf3.format(n||0)}
+function PCT(n){return nf1.format(n||0)+'٪'}
+
+/* ---- storage ---- */
+var store={
+  get:function(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}},
+  set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+/* ---- data ---- */
+var SOURCES=(function(){var v=store.get('yw.sources');return Array.isArray(v)?v:[
+  {id:'free',name:'العمل الحر'},
+  {id:'work',name:'الشغل'},
+  {id:'assoc',name:'الجمعية'}
+]})();
+function saveSources(){store.set('yw.sources',SOURCES)}
+var INIT_GOLD=[
+  {name:'ذهب مع والدي',grams:5.16,karat:21,cost:27500,from:{}},
+  {name:'ذهب معي — جمعية وشغل وعمل حر',grams:3.37,karat:21,cost:15850,from:{}},
+  {name:'ذهب معي — عمل حر وتحويش شغل',grams:3,karat:21,cost:15800,from:{}},
+  {name:'سبيكة ذهب عيار 24',grams:1,karat:24,cost:7300,from:{}},
+  {name:'دبلة عيار 18',grams:1.69,karat:18,cost:9200,from:{}}
+];
+var INIT_CASH=[
+  {name:'فلوس العمل الحر',amount:4250,src:'free'},
+  {name:'تحويش من الشغل',amount:5750,src:'work'},
+  {name:'الجمعية',amount:40000,src:'assoc'}
+];
+/* Latest market snapshot, Egyptian pounds per gram, before workmanship, stamp and tax. */
+var MARKET={
+  at:Date.parse('2026-11-01T11:44:00+02:00'),
+  p24:7040,p21:6160,p18:5280,
+  source:'الدستور',url:'https://www.dostor.org/5759909'
+};
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function validList(v){return Array.isArray(v)?v:null}
+var gold=validList(store.get('yw.gold'))||clone(INIT_GOLD);
+var cash=validList(store.get('yw.cash'))||clone(INIT_CASH);
+/* older saved data has no source: infer it from the name */
+gold.forEach(function(x){delete x.src;if(!x.from||typeof x.from!=='object')x.from={}});
+cash.forEach(function(x){if(typeof x.src!=='string'){var n=x.name||'';x.src=/حر/.test(n)?'free':/شغل/.test(n)?'work':/جمعية/.test(n)?'assoc':''}});
+var manual=store.get('yw.prices');
+if(!manual||!(manual.at>MARKET.at)){manual=null}
+var prices={24:manual?manual.p24:MARKET.p24,21:manual?manual.p21:MARKET.p21,18:manual?manual.p18:MARKET.p18};
+
+function saveAll(){store.set('yw.gold',gold);store.set('yw.cash',cash)}
+function savePrices(){store.set('yw.prices',manual)}
+
+/* ---- animated numbers ---- */
+function setNum(el,v,fmt){
+  var from=(el._v===undefined)?v:el._v;
+  el._v=v;
+  if(reduce||el._v===from||Math.abs(v-from)<1){el.textContent=fmt(v);return}
+  cancelAnimationFrame(el._r);
+  var t0=performance.now(),dur=620;
+  function step(t){
+    var p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=fmt(from+(v-from)*e);
+    if(p<1){el._r=requestAnimationFrame(step)}else{el.textContent=fmt(v)}
+  }
+  el._r=requestAnimationFrame(step);
+}
+
+/* ---- toast ---- */
+var toastTimer;
+function showToast(msg,actionLabel,action){
+  var host=$('#toast');clearTimeout(toastTimer);host.textContent='';
+  var box=document.createElement('div');box.className='toast-box';
+  var s=document.createElement('span');s.textContent=msg;box.appendChild(s);
+  if(actionLabel){var b=document.createElement('button');b.type='button';b.textContent=actionLabel;b.addEventListener('click',function(){host.textContent='';action()});box.appendChild(b)}
+  host.appendChild(box);
+  toastTimer=setTimeout(function(){host.textContent=''},6000);
+}
+
+/* ---- rows ---- */
+function mk(html){var t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstChild}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function srcInputs(){return SOURCES.map(function(s){return '<label>'+esc(s.name)+' (جنيه)<input class="in num" type="number" inputmode="decimal" min="0" step="1" data-s="'+esc(s.id)+'" aria-label="نسبة '+esc(s.name)+'"></label>'}).join('')}
+function srcOptions(){return '<option value="">غير محدد</option>'+SOURCES.map(function(s){return '<option value="'+esc(s.id)+'">'+esc(s.name)+'</option>'}).join('')}
+function paintSrc(row,x){
+  var from=x.from||{},sum=0,parts=[],c=Number(x.cost)||0;
+  SOURCES.forEach(function(s){var a=Number(from[s.id])||0;if(a>0){sum+=a;parts.push(s.name+' '+EGP(a)+' ج.م')}});
+  var over=c>0&&sum>c+0.5,txt;
+  if(!parts.length)txt='المصدر: لسه ما اتحددش';
+  else if(over)txt='المصدر: المبالغ مجموعها '+EGP(sum)+' ج.م وأكبر من تكلفة الشراء '+EGP(c)+' ج.م';
+  else txt='المصدر: '+parts.join(' · ')+(c>sum+0.5?' · غير محدد '+EGP(c-sum)+' ج.م':'');
+  var el=row.querySelector('[data-v=srcsum]');if(el)el.textContent=txt;
+  var d=row.querySelector('.src-det');if(d)d.classList.toggle('warn',over);
+}
+function goldRow(x,i){
+  var r=mk('<div class="row gold-grid" data-i="'+i+'">'
+   +'<div class="c c-name"><label class="cl">القطعة</label><input class="in" data-f="name" aria-label="اسم القطعة"></div>'
+   +'<div class="c c-g"><label class="cl">الوزن (جم)</label><input class="in num" type="number" inputmode="decimal" min="0" step="0.001" data-f="grams" aria-label="الوزن بالجرام"></div>'
+   +'<div class="c c-k"><label class="cl">العيار</label><select class="in" data-f="karat" aria-label="العيار"><option value="24">24</option><option value="21">21</option><option value="18">18</option></select></div>'
+   +'<div class="c c-v"><label class="cl">القيمة الحالية</label><div class="val"><strong data-v="val"></strong><small class="pl" data-v="pl"></small></div></div>'
+   +'<div class="c c-c"><label class="cl">تكلفة الشراء</label><input class="in num" type="number" inputmode="decimal" min="0" step="1" data-f="cost" aria-label="تكلفة الشراء"></div>'
+   +'<div class="c c-x"><button class="btn-del" type="button" data-del aria-label="حذف القطعة"><svg class="ic"><use href="#i-trash"/></svg></button></div>'
+   +'<details class="src-det"><summary><span data-v="srcsum" dir="rtl"></span></summary><div class="src-in">'+srcInputs()+'</div></details>'
+   +'</div>');
+  r.querySelector('[data-f=name]').value=x.name;
+  r.querySelector('[data-f=grams]').value=x.grams;
+  r.querySelector('[data-f=karat]').value=String(x.karat);
+  r.querySelector('[data-f=cost]').value=x.cost;
+  SOURCES.forEach(function(s){var el=r.querySelector('[data-s='+s.id+']');if(el)el.value=(x.from&&x.from[s.id])||''});
+  paintSrc(r,x);
+  return r;
+}
+function cashRow(x,i){
+  var r=mk('<div class="row cash-grid" data-i="'+i+'">'
+   +'<div class="c c-cname"><label class="cl">الاسم</label><input class="in" data-f="name" aria-label="اسم المبلغ"></div>'
+   +'<div class="c c-csrc"><label class="cl">المصدر</label><select class="in" data-f="src" aria-label="مصدر المبلغ">'+srcOptions()+'</select></div>'
+   +'<div class="c c-camt"><label class="cl">المبلغ (جنيه)</label><input class="in num" type="number" inputmode="decimal" min="0" step="1" data-f="amount" aria-label="المبلغ بالجنيه"></div>'
+   +'<div class="c"><button class="btn-del" type="button" data-del aria-label="حذف المصدر"><svg class="ic"><use href="#i-trash"/></svg></button></div>'
+   +'</div>');
+  r.querySelector('[data-f=name]').value=x.name;
+  r.querySelector('[data-f=amount]').value=x.amount;
+  r.querySelector('[data-f=src]').value=x.src||'';
+  return r;
+}
+function renderGold(newIdx){
+  var host=$('#goldRows');host.textContent='';
+  if(!gold.length){var e=document.createElement('p');e.className='empty';e.textContent='لا توجد قطع ذهب مسجلة. أضف أول قطعة من الزر بالأسفل.';host.appendChild(e)}
+  gold.forEach(function(x,i){var r=goldRow(x,i);if(i===newIdx)r.classList.add('enter');host.appendChild(r)});
+  update();
+}
+function renderCash(newIdx){
+  var host=$('#cashRows');host.textContent='';
+  if(!cash.length){var e=document.createElement('p');e.className='empty';e.textContent='لا توجد مصادر نقدية مسجلة.';host.appendChild(e)}
+  cash.forEach(function(x,i){var r=cashRow(x,i);if(i===newIdx)r.classList.add('enter');host.appendChild(r)});
+  update();
+}
+
+function bindList(hostSel,list,kind){
+  var host=$(hostSel);
+  host.addEventListener('input',function(e){
+    var row=e.target.closest('.row');if(!row)return;
+    var i=+row.dataset.i,f=e.target.dataset.f;if(!f||!list()[i])return;
+    list()[i][f]=(f==='name'||f==='src')?e.target.value:(e.target.value===''?0:Number(e.target.value));
+    saveAll();update();
+  });
+  host.addEventListener('change',function(e){
+    var row=e.target.closest('.row');if(!row||e.target.tagName!=='SELECT'||e.target.dataset.f!=='karat')return;
+    var i=+row.dataset.i;list()[i].karat=Number(e.target.value);saveAll();update();
+  });
+  host.addEventListener('click',function(e){
+    var b=e.target.closest('[data-del]');if(!b)return;
+    var row=b.closest('.row'),i=+row.dataset.i,arr=list(),item=arr[i];
+    arr.splice(i,1);saveAll();
+    if(kind==='gold')renderGold();else renderCash();
+    showToast('تم حذف «'+(item.name||'بدون اسم')+'»','تراجع',function(){
+      list().splice(i,0,item);saveAll();
+      if(kind==='gold')renderGold();else renderCash();
+    });
+  });
+}
+bindList('#goldRows',function(){return gold},'gold');
+bindList('#cashRows',function(){return cash},'cash');
+$('#goldRows').addEventListener('input',function(e){
+  var s=e.target.dataset&&e.target.dataset.s;if(!s)return;
+  var row=e.target.closest('.row');if(!row)return;
+  var x=gold[+row.dataset.i];if(!x)return;
+  if(!x.from||typeof x.from!=='object')x.from={};
+  var v=e.target.value===''?0:Number(e.target.value);
+  if(!(v>0))delete x.from[s];else x.from[s]=v;
+  saveAll();update();
+});
+
+$('#addGold').addEventListener('click',function(){
+  gold.push({name:'ذهب جديد',grams:0,karat:21,cost:0,from:{}});saveAll();renderGold(gold.length-1);
+  var el=$('#goldRows .row:last-child [data-f=name]');if(el){el.focus();el.select()}
+});
+$('#addCash').addEventListener('click',function(){
+  cash.push({name:'مبلغ جديد',amount:0,src:''});saveAll();renderCash(cash.length-1);
+  var el=$('#cashRows .row:last-child [data-f=name]');if(el){el.focus();el.select()}
+});
+$('#resetGold').addEventListener('click',function(){$('#resetGold').hidden=true;$('#addGold').hidden=true;$('#resetAsk').hidden=false});
+$('#resetNo').addEventListener('click',function(){$('#resetAsk').hidden=true;$('#resetGold').hidden=false;$('#addGold').hidden=false});
+$('#resetYes').addEventListener('click',function(){
+  gold=clone(INIT_GOLD);saveAll();renderGold();
+  $('#resetAsk').hidden=true;$('#resetGold').hidden=false;$('#addGold').hidden=false;
+  showToast('رجعت قائمة الذهب للبيانات الأصلية');
+});
+
+/* ---- sources ---- */
+function closeSrcForm(){$('#srcForm').hidden=true;$('#addSrc').hidden=false;$('#srcName').value=''}
+$('#addSrc').addEventListener('click',function(){$('#srcForm').hidden=false;$('#addSrc').hidden=true;$('#srcName').focus()});
+$('#srcCancel').addEventListener('click',closeSrcForm);
+$('#srcForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  var name=$('#srcName').value.trim();if(!name)return;
+  SOURCES.push({id:'s'+Date.now().toString(36),name:name});
+  saveSources();closeSrcForm();renderGold();renderCash();
+  showToast('اتضاف المصدر «'+name+'»');
+});
+$('#srcGrid').addEventListener('click',function(e){
+  var b=e.target.closest('[data-src]');if(!b)return;
+  var id=b.getAttribute('data-src'),i=-1;
+  SOURCES.forEach(function(s,k){if(s.id===id)i=k});
+  if(i<0)return;
+  var removed=SOURCES.splice(i,1)[0];
+  saveSources();renderGold();renderCash();
+  showToast('تم حذف المصدر «'+removed.name+'»','تراجع',function(){
+    SOURCES.splice(i,0,removed);saveSources();renderGold();renderCash();
+  });
+});
+
+/* ---- prices ---- */
+function isStale(){return Date.now()-MARKET.at>24*3600*1000}
+function renderPriceInputs(){
+  [24,21,18].forEach(function(k){var el=$('#p'+k);if(document.activeElement!==el)el.value=prices[k]});
+}
+function renderFresh(){
+  var chip=$('#priceChip'),useBtn=$('#useMarket'),note=$('#priceNote');
+  if(manual){
+    chip.textContent='تعديل يدوي';chip.className='chip manual';useBtn.hidden=false;
+  }else{
+    chip.textContent=isStale()?'سعر السوق · قديم':'سعر السوق';chip.className='chip';useBtn.hidden=true;
+  }
+  note.textContent='';
+  var a=document.createElement('a');a.href=MARKET.url;a.target='_blank';a.rel='noopener';a.textContent=MARKET.source;
+  note.appendChild(a);
+}
+[24,21,18].forEach(function(k){
+  $('#p'+k).addEventListener('input',function(e){
+    var v=e.target.value===''?0:Number(e.target.value);
+    prices[k]=v;
+    manual={p24:prices[24],p21:prices[21],p18:prices[18],at:Date.now()};
+    savePrices();renderFresh();update();
+  });
+});
+$('#useMarket').addEventListener('click',function(){
+  manual=null;savePrices();
+  prices={24:MARKET.p24,21:MARKET.p21,18:MARKET.p18};
+  renderPriceInputs();renderFresh();update();
+  showToast('رجعت أسعار السوق');
+});
+
+/* ---- totals ---- */
+function totals(){
+  var grams=0,gv=0,cost=0,by={24:0,21:0,18:0};
+  gold.forEach(function(x){
+    var g=Number(x.grams)||0,k=Number(x.karat);
+    grams+=g;gv+=g*(prices[k]||0);cost+=Number(x.cost)||0;by[k]=(by[k]||0)+g;
+  });
+  var cv=cash.reduce(function(a,x){return a+(Number(x.amount)||0)},0);
+  return {grams:grams,gv:gv,cost:cost,by:by,cv:cv};
+}
+function breakdown(){
+  var by={},un={gold:0,cash:0};
+  SOURCES.forEach(function(s){by[s.id]={id:s.id,name:s.name,gold:0,cash:0}});
+  gold.forEach(function(x){
+    var v=(Number(x.grams)||0)*(prices[Number(x.karat)]||0);if(v<=0)return;
+    var from=x.from||{},sum=0,used=0;
+    SOURCES.forEach(function(s){sum+=Number(from[s.id])||0});
+    var den=Math.max(Number(x.cost)||0,sum);
+    if(den>0)SOURCES.forEach(function(s){var amt=Number(from[s.id])||0;if(amt>0){var p=amt/den;by[s.id].gold+=v*p;used+=p}});
+    un.gold+=v*(1-Math.min(1,used));
+  });
+  cash.forEach(function(x){var a=Number(x.amount)||0;if(by[x.src])by[x.src].cash+=a;else un.cash+=a});
+  var rows=SOURCES.map(function(s){var r=by[s.id];r.total=r.gold+r.cash;return r});
+  un.total=un.gold+un.cash;
+  return {rows:rows,un:un};
+}
+function renderSources(total){
+  var b=breakdown(),host=$('#srcGrid'),note=$('#srcNote');host.textContent='';
+  var items=b.rows.slice();
+  if(b.un.total>=0.5)items.push({name:'غير محدد المصدر',gold:b.un.gold,cash:b.un.cash,total:b.un.total,unset:true});
+  if(!items.length){var e=document.createElement('p');e.className='empty';e.textContent='لسه مفيش فلوس مسجلة.';host.appendChild(e)}
+  items.forEach(function(r){
+    var gp=r.total>0?r.gold/r.total*100:0,cp=100-gp,share=total>0?r.total/total*100:0;
+    var card=mk('<div class="src-card'+(r.unset?' unset':'')+'">'
+      +'<div class="src-top"><span class="src-name">'+esc(r.name)+'</span><span class="src-pct">'+PCT(share)+' من المحفظة</span>'+(r.id?'<button class="src-x" type="button" data-src="'+esc(r.id)+'" aria-label="حذف المصدر"><svg class="ic"><use href="#i-trash"/></svg></button>':'')+'</div>'
+      +'<div class="src-total">'+EGP(r.total)+'<small>ج.م</small></div>'
+      +'<div class="src-bar" aria-hidden="true">'+(r.gold>=0.5?'<span class="sg"></span>':'')+(r.cash>=0.5?'<span class="sc"></span>':'')+'</div>'
+      +'<div class="src-legend"><div><span><i class="d-g"></i>ذهب</span><b>'+EGP(r.gold)+' ج.م</b></div><div><span><i class="d-c"></i>نقدية</span><b>'+EGP(r.cash)+' ج.م</b></div></div>'
+      +'</div>');
+    var sg=card.querySelector('.sg'),sc=card.querySelector('.sc');
+    if(sg)sg.style.flexBasis=gp+'%';
+    if(sc)sc.style.flexBasis=cp+'%';
+    host.appendChild(card);
+  });
+  var msgs=[];
+  if(b.un.gold>=0.5)msgs.push('لسه '+EGP(b.un.gold)+' ج.م من الذهب مش متحدد مصدره. افتح «المصدر» تحت كل قطعة ذهب وحط المبالغ.');
+  if(b.un.cash>=0.5)msgs.push(EGP(b.un.cash)+' ج.م نقدية من غير مصدر. اختار المصدر من القائمة جنب المبلغ.');
+  note.hidden=!msgs.length;note.textContent=msgs.join(' ');
+}
+function update(){
+  var t=totals();
+  var rows=$('#goldRows').querySelectorAll('.row');
+  gold.forEach(function(x,i){
+    var row=rows[i];if(!row)return;
+    var v=(Number(x.grams)||0)*(prices[Number(x.karat)]||0),c=Number(x.cost)||0,d=v-c;
+    row.querySelector('[data-v=val]').textContent=EGP(v);
+    var pl=row.querySelector('[data-v=pl]');
+    if(c>0){pl.textContent=(d>=0?'▲ ':'▼ ')+EGP(Math.abs(d))+' ج.م';pl.className='pl '+(d>=0?'pos':'neg')}
+    else{pl.textContent='';pl.className='pl'}
+    paintSrc(row,x);
+  });
+  var total=t.gv+t.cv;
+  setNum($('#grandTotal'),total,EGP);
+  setNum($('#goldValue'),t.gv,EGP);
+  setNum($('#cashValue'),t.cv,EGP);
+  setNum($('#cashHead'),t.cv,EGP);
+  $('#totalGrams').textContent=GM(t.grams);
+  var pg=total>0?(t.gv/total*100):0,pc=total>0?100-pg:0;
+  $('#barGold').style.flexBasis=pg+'%';$('#barCash').style.flexBasis=pc+'%';
+  $('#pctGold').textContent=PCT(pg);$('#pctCash').textContent=PCT(pc);
+  var diff=t.gv-t.cost,hd=$('#heroDelta');
+  if(t.cost>0){
+    hd.hidden=false;hd.className='delta '+(diff>=0?'pos':'neg');
+    hd.textContent=(diff>=0?'▲ ':'▼ ')+EGP(Math.abs(diff))+' ج.م ('+PCT(Math.abs(diff)/t.cost*100)+') '+(diff>=0?'فوق':'تحت')+' تكلفة الذهب';
+  }else{hd.hidden=true}
+  $('#itemCount').textContent=nf0.format(gold.length);
+  [24,21,18].forEach(function(k){$('#g'+k).textContent=GM(t.by[k]||0)+' جم'});
+  $('#goldCost').textContent=EGP(t.cost)+' ج.م';
+  var ge=$('#goldDiff');ge.textContent=(diff>=0?'▲ ':'▼ ')+EGP(Math.abs(diff))+' ج.م';ge.className=diff>=0?'pos':'neg';
+  $('#cashTotal').textContent=EGP(t.cv)+' ج.م';
+  renderSources(total);
+}
+
+/* ---- CSV (offered through the downloads capability when the viewer allows it) ---- */
+function csvText(){
+  var t=totals();
+  var lines=[['النوع','الاسم','الوزن جرام','العيار','القيمة جنيه']];
+  gold.forEach(function(x){lines.push(['ذهب',x.name,x.grams,x.karat,Math.round((Number(x.grams)||0)*(prices[Number(x.karat)]||0)*100)/100])});
+  cash.forEach(function(x){lines.push(['نقدية',x.name,'','',x.amount])});
+  lines.push(['ملخص','إجمالي الذهب جرام',t.grams,'',t.gv]);
+  lines.push(['ملخص','إجمالي المحفظة','','',t.gv+t.cv]);
+  var b=breakdown();
+  b.rows.forEach(function(r){if(r.total>=0.5){lines.push(['حسب المصدر','ذهب · '+r.name,'','',Math.round(r.gold)]);lines.push(['حسب المصدر','نقدية · '+r.name,'','',Math.round(r.cash)])}});
+  if(b.un.total>=0.5){lines.push(['حسب المصدر','ذهب · غير محدد','','',Math.round(b.un.gold)]);lines.push(['حسب المصدر','نقدية · غير محدد','','',Math.round(b.un.cash)])}
+  return '﻿'+lines.map(function(r){return r.map(function(v){return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')}).join('\r\n');
+}
+function textSummary(){
+  var t=totals(),b=breakdown(),total=t.gv+t.cv,L=[];
+  L.push('ملخص محفظتي — '+new Date().toLocaleDateString('ar-EG',{day:'numeric',month:'long',year:'numeric'}));
+  L.push('إجمالي المحفظة: '+EGP(total)+' ج.م');
+  L.push('الذهب: '+EGP(t.gv)+' ج.م ('+GM(t.grams)+' جم)');
+  L.push('النقدية: '+EGP(t.cv)+' ج.م');
+  L.push('سعر الجرام: عيار ٢٤ = '+EGP(prices[24])+' | عيار ٢١ = '+EGP(prices[21])+' | عيار ١٨ = '+EGP(prices[18]));
+  if(t.cost>0){var d=t.gv-t.cost;L.push('الفرق عن تكلفة الذهب: '+(d>=0?'+':'-')+EGP(Math.abs(d))+' ج.م')}
+  L.push('');L.push('حسب المصدر:');
+  b.rows.concat([{name:'غير محدد المصدر',gold:b.un.gold,cash:b.un.cash,total:b.un.total}]).forEach(function(r){
+    if(r.total>=0.5)L.push('• '+r.name+': '+EGP(r.total)+' ج.م (ذهب '+EGP(r.gold)+' + نقدية '+EGP(r.cash)+')');
+  });
+  return L.join('\n');
+}
+function copySummary(prefix){
+  var txt=textSummary();
+  function fail(){showToast('تعذر النسخ من هذا العرض')}
+  try{navigator.clipboard.writeText(txt).then(function(){showToast((prefix||'')+'نسخت الملخص')}).catch(fail)}catch(e){fail()}
+}
+var dl=null;
+if(window.claude&&window.claude.use){
+  window.claude.use('downloads').then(function(d){dl=d}).catch(function(){});
+}
+$('#csvBtn').addEventListener('click',function(){
+  if(!dl){copySummary('التنزيل مش متاح هنا، ');return}
+  dl.save({filename:'my-wallet.csv',data:csvText()}).then(function(){showToast('تم حفظ الملف')}).catch(function(err){
+    if(err&&err.code==='declined')return;
+    if(err&&err.code==='rate_limited'){showToast('استنى لحظة وحاول تاني');return}
+    copySummary('تعذر التنزيل، ');
+  });
+});
+$('#copyBtn').addEventListener('click',function(){copySummary('')});
+
+/* ---- theme ---- */
+function effTheme(){
+  var t=document.documentElement.getAttribute('data-theme');
+  if(t==='light'||t==='dark')return t;
+  return window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark';
+}
+function paintThemeIcon(){$('#themeIc').firstElementChild.setAttribute('href',effTheme()==='dark'?'#i-sun':'#i-moon')}
+(function(){var s=store.get('yw.theme');if(s==='light'||s==='dark')document.documentElement.setAttribute('data-theme',s)})();
+$('#themeBtn').addEventListener('click',function(){
+  var next=effTheme()==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);store.set('yw.theme',next);paintThemeIcon();
+});
+paintThemeIcon();
+
+/* ---- start ---- */
+renderGold();renderCash();renderPriceInputs();renderFresh();update();
+setInterval(renderFresh,60000);
+})();
+</script>
+
+</body></html>
